@@ -29,6 +29,7 @@ jobs:
         run: npm run build
       
       - name: test
+        working-directory: /home/runner/work/DevilLib-Docs/DevilLib-Docs/my-website
         run: |
           ls
           pwd
@@ -36,7 +37,7 @@ jobs:
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build
+          path: my-website/build
 
   deploy:
     name: Deploy to GitHub Pages
