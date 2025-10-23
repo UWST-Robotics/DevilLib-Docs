@@ -1,0 +1,108 @@
+---
+sidebar_position: 1
+---
+
+# 1 - Drivetrain Chassis
+
+## Initialization
+
+```cpp
+// Define SmartMotorGroups for left and right motors
+SmartMotorGroup leftMotors = SmartMotorGroup("LeftMotors", {1, -2, 3, -4});
+SmartMotorGroup rightMotors = SmartMotorGroup("RightMotors", {-5, 6, -7, 8});
+
+// Create a TankChassis using the defined motor groups
+TankChassis chassis = TankChassis(leftMotors, rightMotors);
+```
+
+### Usage
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+    <TabItem value="arcade" label="Arcade" default>
+        Arcade controls allow the robot to be driven using a horizontal and vertical joystick input.
+
+        ```cpp
+        // Initialize the main controller
+        pros::Controller mainController = pros::Controller(pros::E_CONTROLLER_MASTER);
+
+        // Operator control function
+        void opcontrol() {
+
+            // Infinite loop for operator control
+            while (true) {
+            
+                // Read joystick values from the main controller
+                double leftY = mainController.get_analog(ANALOG_LEFT_Y);
+                double rightX = mainController.get_analog(ANALOG_RIGHT_X);
+                
+                // Normalize to [-1.0, 1.0]
+                leftY /= 127.0;
+                rightX /= 127.0;
+            
+                // Move chassis based on joystick inputs
+                chassis.move(
+                    leftY,  // Forward/backward speed [-1.0 to 1.0]
+                    rightX  // Turning speed [-1.0 to 1.0]
+                );
+            
+                // Delay to prevent the CPU from being overloaded
+                pros::delay(20);
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="tank" label="Tank" default>
+        Tank controls allow the robot to be driven using two separate joystick inputs for the left and right sides.
+
+        ```cpp
+        // Initialize the main controller
+        pros::Controller mainController = pros::Controller(pros::E_CONTROLLER_MASTER);
+
+        // Operator control function
+        void opcontrol() {
+
+            // Infinite loop for operator control
+            while (true) {
+            
+                // Read joystick values from the main controller
+                double leftY = mainController.get_analog(ANALOG_LEFT_Y);
+                double rightY = mainController.get_analog(ANALOG_RIGHT_Y);
+                
+                // Normalize to [-1.0, 1.0]
+                leftY /= 127.0;
+                rightY /= 127.0;
+            
+                // Move chassis based on joystick inputs
+                chassis.moveTank(
+                    leftY,  // Left Forward/backward speed [-1.0 to 1.0]
+                    rightY  // Right Forward/backward speed [-1.0 to 1.0]
+                );
+            
+                // Delay to prevent the CPU from being overloaded
+                pros::delay(20);
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+## Configuration
+
+### Brake Mode
+
+By default, `SmartMotorGroup` motors are set to `coast` mode after they are passed into a `TankChassis`.
+While this is configurable, it is **highly recommended** to keep the drivetrain motors in `coast` mode to prevent Smart Motors from overheating during matches.
+
+```cpp
+void initialize() {
+    // Enable brake mode on drivetrain motors
+    // DO NOT do this unless you know what you are doing!
+    leftMotors.setBrakeMode(true);
+    rightMotors.setBrakeMode(true);
+
+    // ...
+}
+```
