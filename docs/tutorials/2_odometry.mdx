@@ -1,0 +1,142 @@
+---
+sidebar_position: 2
+---
+
+# 2 - Odometry
+
+## Initialization
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs groupId="odometry-type">
+
+    <TabItem value="perpendicular" label="Perpendicular" default>
+        ```cpp
+        // Define rotation sensors for odometry wheels
+        RotationSensor verticalOdomWheel = RotationSensor("VerticalOdomWheel", 10);
+        RotationSensor horizontalOdomWheel = RotationSensor("HorizontalOdomWheel", 11);
+
+        // Define the radius of the dead wheels (in inches)
+        static constexpr double DEAD_WHEEL_RADIUS = 1.0; // in
+
+        // Create a perpendicular sensor odometry object
+        // (Since PerpendicularSensorOdometry is an AsyncTask, we must use a shared pointer)
+        PerpendicularSensorOdometry odometry = PerpendicularSensorOdometry(
+            verticalOdomWheel,
+            horizontalOdomWheel,
+            DEAD_WHEEL_RADIUS
+        );
+
+        // Run odometry in a background task
+        void initialize() {
+            odometry.start();
+        }
+        ```
+    </TabItem>
+
+    <TabItem value="parallel" label="Parallel">
+        ```cpp        
+        // Define rotation sensors for odometry wheels
+        RotationSensor leftOdomWheel = RotationSensor("LeftOdomWheel", 10);
+        RotationSensor rightOdomWheel = RotationSensor("RightOdomWheel", 11);
+
+        // Define the radius of the dead wheels (in inches)
+        static constexpr double DEAD_WHEEL_RADIUS = 1.0; // in
+
+        // Define the distance between the left and right odometry wheels (in inches)
+        static constexpr double DEAD_WHEEL_BASE = 12.0; // in
+
+        // Create a parallel sensor odometry object
+        // (Since ParallelSensorOdometry is an AsyncTask, we must use a shared pointer)
+        std::shared_ptr<ParallelSensorOdometry> odometry = std::make_shared<ParallelSensorOdometry>(
+            leftOdomWheel,
+            rightOdomWheel,
+            DEAD_WHEEL_RADIUS,
+            DEAD_WHEEL_BASE
+        );
+
+        // Run odometry in a background task
+        void initialize() {
+            odometry.start();
+        }
+        ```
+    </TabItem>
+</Tabs>
+
+## Usage
+
+Odometry provides the current heading and position of the robot on the field as a `Pose` object.
+The `Pose` provides `x` and `y` coordinates (in inches) representing the robot's position, as well as a `heading` (in degrees) representing the robot's orientation.
+
+```cpp
+void opcontrol() {
+    while (true) {
+        // Get the current pose of the robot
+        Pose pose = odometry.getPose();
+        std::cout << "X: " << pose.x << " Y: " << pose.y << " Heading: " << pose.heading << std::endl;
+
+        // Example: Resetting the robot's pose when a button is pressed
+        bool resetPose = mainController.get_digital(DIGITAL_A);
+        if (resetPose)
+            odometry.setPose(Pose(0, 0, 0));
+
+        // ...
+    }
+}
+```
+
+## Configuration
+
+### Inertial Sensor
+
+An Inertial Sensor (IMU) can be used to improve the accuracy of odometry calculations by providing accurate orientation data that drifts significantly less over time.
+While optional, it is **highly recommended** to use an IMU for the best performance.
+
+```cpp
+// Define the Inertial Sensor
+InertialSensor imu = InertialSensor("IMU", 15);
+
+void initialize() {
+    // Use the IMU for odometry calculations
+    odometry.useIMU(&imu);
+
+    // ...
+}
+```
+
+### Rotational Compensation
+
+<Tabs groupId="odometry-type">
+
+    <TabItem value="perpendicular" label="Perpendicular" default>
+        When the robot rotates, the perpendicular orientation of the odometry wheels can inadvertently cause lateral movement readings.
+        To correct for this, you can set the offsets of the odometry sensors relative to the robot's center of rotation.
+
+        These are defined as `Vector2` objects, where the x-coordinate represents the horizontal offset (left/right) and the y-coordinate represents the vertical offset (forward/backward).
+
+        :::note
+        You may have to manually tune these values based on the position and grip of your odometry wheels.
+        :::
+
+        ```cpp
+        // Offset values for the odometry sensors, relative to the robot's center of rotation (in inches)
+        Vector2 verticalSensorOffset = Vector2(-0.5, 0);    // (Y position is disregarded)
+        Vector2 horizontalSensorOffset = Vector2(0, 1);     // (X position is disregarded)
+
+        void initialize() {
+            // Apply the offsets for odometry calculations
+            odometry.setSensorOffsets(verticalSensorOffset, horizontalSensorOffset);
+
+            // ...
+        }
+
+        ```
+    </TabItem>
+
+    <TabItem value="parallel" label="Parallel">
+        :::tip[You don't need this with Parallel Odom Wheels]
+        Rotational compensation is not required for Parallel Sensor Odometry since the odometry wheels will not produce inadvertent lateral movement readings when the robot rotates.
+        :::
+    </TabItem>
+</Tabs>
