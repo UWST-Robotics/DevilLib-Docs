@@ -22,7 +22,5 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        working-directory: /home/runner/work/DevilLib-Docs/DevilLib-Docs/my-website
       - name: Test build website
-        working-directory: /home/runner/work/DevilLib-Docs/DevilLib-Docs/my-website
         run: npm run build
