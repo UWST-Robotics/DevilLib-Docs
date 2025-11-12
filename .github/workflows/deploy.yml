@@ -22,22 +22,15 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        working-directory: /home/runner/work/DevilLib-Docs/DevilLib-Docs/my-website
         run: npm ci
+
       - name: Build website
-        working-directory: /home/runner/work/DevilLib-Docs/DevilLib-Docs/my-website
         run: npm run build
-      
-      - name: test
-        working-directory: /home/runner/work/DevilLib-Docs/DevilLib-Docs/my-website
-        run: |
-          ls
-          pwd
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: my-website/build
+          path: ./build
 
   deploy:
     name: Deploy to GitHub Pages
