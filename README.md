@@ -1,41 +1,38 @@
-# Website
+# DevilLib Docs
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Public documentation for [DevilLib](https://github.com/UWST-Robotics/DevilLib) - PROS library built and maintained by
+DevilBots for use in VURC/V5RC competitions.
 
-## Installation
+[https://docs.devilbots.org/](https://docs.devilbots.org/)
 
-```bash
-yarn
-```
+## Running Locally
 
-## Local Development
+### Prerequisites
 
-```bash
-yarn start
-```
+- [Node.js](https://nodejs.org/en/) (v20 or higher)
+- [Git](https://git-scm.com/)
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+### Steps
 
-## Build
-
-```bash
-yarn build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+1. Clone the repository:
+   ```bash
+    git clone
+   ```
+2. Navigate to the project directory:
+   ```bash
+    cd devillib-docs
+    ```
+3. Install dependencies:
+   ```bash
+    npm install
+    ```
+4. Start the development server:
+   ```bash
+    npm start
+    ```
 
 ## Deployment
 
-Using SSH:
-
-```bash
-USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```bash
-GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+The documentation site is automatically deployed to GitHub Pages whenever changes are pushed to the `main` branch.
+Once you've pushed changes to your own fork or branch, you can create a pull request to have them merged into the main
+repository.
