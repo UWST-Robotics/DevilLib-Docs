@@ -16,8 +16,8 @@ const config = {
     baseUrl: '/',
 
     // GitHub pages deployment config.
-    organizationName: 'UWST-Robotics', // Usually your GitHub org/user name.
-    projectName: 'DevilBots-Docs', // Usually your repo name.
+    organizationName: 'UWST-Robotics',
+    projectName: 'DevilBots-Docs',
 
     onBrokenLinks: 'throw',
     i18n: {
