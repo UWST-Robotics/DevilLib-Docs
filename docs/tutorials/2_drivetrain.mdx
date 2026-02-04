@@ -19,9 +19,19 @@ TankChassis chassis = TankChassis(leftMotors, rightMotors);
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
 
 <Tabs>
     <TabItem value="arcade" label="Arcade" default>
+        <ThemedImage
+          alt="Arcade Controls"
+          sources={{
+            light: useBaseUrl('/img/ArcadeControls-Light.png'),
+            dark: useBaseUrl('/img/ArcadeControls-Dark.png'),
+          }}
+        />
+
         Arcade controls allow the robot to be driven using a horizontal and vertical joystick input.
 
         ```cpp
@@ -36,16 +46,16 @@ import TabItem from '@theme/TabItem';
             
                 // Read joystick values from the main controller
                 double leftY = mainController.get_analog(ANALOG_LEFT_Y);
-                double rightX = mainController.get_analog(ANALOG_RIGHT_X);
+                double leftX = mainController.get_analog(ANALOG_LEFT_X);
                 
                 // Normalize to [-1.0, 1.0]
                 leftY /= 127.0;
-                rightX /= 127.0;
+                leftX /= 127.0;
             
                 // Move chassis based on joystick inputs
                 chassis.move(
                     leftY,  // Forward/backward speed [-1.0 to 1.0]
-                    rightX  // Turning speed [-1.0 to 1.0]
+                    leftX  // Turning speed [-1.0 to 1.0]
                 );
             
                 // Delay to prevent the CPU from being overloaded
@@ -54,7 +64,56 @@ import TabItem from '@theme/TabItem';
         }
         ```
     </TabItem>
+    <TabItem value="splitarcade" label="Split Arcade" default>
+        <ThemedImage
+          alt="Split Arcade Controls"
+          sources={{
+            light: useBaseUrl('/img/SplitArcadeControls-Light.png'),
+            dark: useBaseUrl('/img/SplitArcadeControls-Dark.png'),
+          }}
+        />
+
+        Split arcade controls are similar to arcade, but split across 2 different joysticks.
+
+        ```cpp
+        // Initialize the main controller
+        pros::Controller mainController = pros::Controller(pros::E_CONTROLLER_MASTER);
+
+        // Operator control function
+        void opcontrol() {
+
+            // Infinite loop for operator control
+            while (true) {
+
+                // Read joystick values from the main controller
+                double leftY = mainController.get_analog(ANALOG_LEFT_Y);
+                double rightX = mainController.get_analog(ANALOG_RIGHT_X);
+
+                // Normalize to [-1.0, 1.0]
+                leftY /= 127.0;
+                rightX /= 127.0;
+
+                // Move chassis based on joystick inputs
+                chassis.move(
+                    leftY,  // Forward/backward speed [-1.0 to 1.0]
+                    rightX  // Turning speed [-1.0 to 1.0]
+                );
+
+                // Delay to prevent the CPU from being overloaded
+                pros::delay(20);
+            }
+        }
+        ```
+    </TabItem>
     <TabItem value="tank" label="Tank" default>
+        <ThemedImage
+          alt="Tank Controls"
+          sources={{
+            light: useBaseUrl('/img/TankControls-Light.png'),
+            dark: useBaseUrl('/img/TankControls-Dark.png'),
+          }}
+        />
+
         Tank controls allow the robot to be driven using two separate joystick inputs for the left and right sides.
 
         ```cpp

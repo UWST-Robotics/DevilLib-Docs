@@ -4,8 +4,8 @@ import {themes as prismThemes} from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-    title: 'DevilLib Docs',
-    tagline: 'Dinosaurs are cool',
+    title: 'DevilLib',
+    tagline: 'Building bots, raising hell',
     favicon: 'img/favicon.ico',
 
     future: {
@@ -50,10 +50,10 @@ const config = {
                 respectPrefersColorScheme: true,
             },
             navbar: {
-                title: 'DevilLib Docs',
+                title: 'DevilLib',
                 logo: {
                     alt: 'My Site Logo',
-                    src: 'img/logo.svg',
+                    src: 'img/logo.png',
                 },
                 items: [
                     {
@@ -63,7 +63,7 @@ const config = {
                         label: 'Getting Started',
                     },
                     {
-                        href: 'https://github.com/UWST-Robotics/DevilLib-Docs',
+                        href: 'https://github.com/UWST-Robotics/DevilLib',
                         label: 'GitHub',
                         position: 'right',
                     },
