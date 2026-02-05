@@ -1,26 +1,60 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # 2 - Drivetrain Chassis
-
-## Initialization
-
-```cpp
-// Define SmartMotorGroups for left and right motors
-SmartMotorGroup leftMotors = SmartMotorGroup("LeftMotors", {1, -2, 3, -4});
-SmartMotorGroup rightMotors = SmartMotorGroup("RightMotors", {-5, 6, -7, 8});
-
-// Create a TankChassis using the defined motor groups
-TankChassis chassis = TankChassis(leftMotors, rightMotors);
-```
-
-### Usage
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import ThemedImage from '@theme/ThemedImage';
+
+### Initialization
+<Tabs>
+    <TabItem value="tank" label="Tank" default>
+        <ThemedImage
+          alt="Tank Drive"
+          sources={{
+            light: useBaseUrl('/img/TankDrive-Light.png'),
+            dark: useBaseUrl('/img/TankDrive-Dark.png'),
+          }}
+        />
+
+        Tank drive is one of the most common drivetrain configurations due to its ease of use, reliability, and minimal complexity.
+        It works by utilizing 2 sets of wheels on each side of the robot. These wheels can be traction wheels, omni wheels, or a combination of multiple types.
+
+        - The robot can move **forward/backward** by moving the wheels forward/backward
+        - The robot can **rotate** by moving the wheels opposite of each other.
+
+        ```cpp
+        // Define SmartMotorGroups for left and right motors
+        SmartMotorGroup leftMotors = SmartMotorGroup("LeftMotors", {1, -2, 3});
+        SmartMotorGroup rightMotors = SmartMotorGroup("RightMotors", {-4, 5, -6});
+
+        // Create a TankChassis using the defined motor groups
+        TankChassis chassis = TankChassis(leftMotors, rightMotors);
+        ```
+    </TabItem>
+    <TabItem value="xdrive" label="X-Drive" default>
+        *Not yet implemented*
+    </TabItem>
+    <TabItem value="hdrive" label="H-Drive" default>
+        *Not yet implemented*
+    </TabItem>
+    <TabItem value="mecanum" label="Mecanum" default>
+        *Not yet implemented*
+    </TabItem>
+    <TabItem value="swerve" label="Swerve" default>
+        *Not yet implemented*
+    </TabItem>
+</Tabs>
+
+:::info
+    Mecanum, swerve, X-drive, and H-drive are all known as **holonomic** drivetrains.
+    That is, they can move forwards, backwards, **and sideways**.
+:::
+
+### Controls
 
 <Tabs>
     <TabItem value="arcade" label="Arcade" default>
@@ -35,31 +69,17 @@ import ThemedImage from '@theme/ThemedImage';
         Arcade controls allow the robot to be driven using a horizontal and vertical joystick input.
 
         ```cpp
-        // Initialize the main controller
-        pros::Controller mainController = pros::Controller(pros::E_CONTROLLER_MASTER);
-
-        // Operator control function
         void opcontrol() {
-
-            // Infinite loop for operator control
             while (true) {
-            
-                // Read joystick values from the main controller
-                double leftY = mainController.get_analog(ANALOG_LEFT_Y);
-                double leftX = mainController.get_analog(ANALOG_LEFT_X);
-                
-                // Normalize to [-1.0, 1.0]
-                leftY /= 127.0;
-                leftX /= 127.0;
-            
+
                 // Move chassis based on joystick inputs
                 chassis.move(
-                    leftY,  // Forward/backward speed [-1.0 to 1.0]
-                    leftX  // Turning speed [-1.0 to 1.0]
+                    mainController.leftY,  // Forward/backward speed [-1.0 to 1.0]
+                    mainController.leftX,  // Turning speed [-1.0 to 1.0]
+                    0
                 );
-            
-                // Delay to prevent the CPU from being overloaded
-                pros::delay(20);
+
+                // ...
             }
         }
         ```
@@ -76,36 +96,26 @@ import ThemedImage from '@theme/ThemedImage';
         Split arcade controls are similar to arcade, but split across 2 different joysticks.
 
         ```cpp
-        // Initialize the main controller
-        pros::Controller mainController = pros::Controller(pros::E_CONTROLLER_MASTER);
-
-        // Operator control function
         void opcontrol() {
-
-            // Infinite loop for operator control
             while (true) {
-
-                // Read joystick values from the main controller
-                double leftY = mainController.get_analog(ANALOG_LEFT_Y);
-                double rightX = mainController.get_analog(ANALOG_RIGHT_X);
-
-                // Normalize to [-1.0, 1.0]
-                leftY /= 127.0;
-                rightX /= 127.0;
 
                 // Move chassis based on joystick inputs
                 chassis.move(
-                    leftY,  // Forward/backward speed [-1.0 to 1.0]
-                    rightX  // Turning speed [-1.0 to 1.0]
+                    mainController.leftY,  // Forward/backward speed [-1.0 to 1.0]
+                    mainController.rightX,  // Turning speed [-1.0 to 1.0]
+                    0
                 );
 
-                // Delay to prevent the CPU from being overloaded
-                pros::delay(20);
+                // ...
             }
         }
         ```
     </TabItem>
     <TabItem value="tank" label="Tank" default>
+        :::warning
+        This is only applicable to tank drive chassis.
+        :::
+
         <ThemedImage
           alt="Tank Controls"
           sources={{
@@ -117,51 +127,18 @@ import ThemedImage from '@theme/ThemedImage';
         Tank controls allow the robot to be driven using two separate joystick inputs for the left and right sides.
 
         ```cpp
-        // Initialize the main controller
-        pros::Controller mainController = pros::Controller(pros::E_CONTROLLER_MASTER);
-
-        // Operator control function
         void opcontrol() {
-
-            // Infinite loop for operator control
             while (true) {
-            
-                // Read joystick values from the main controller
-                double leftY = mainController.get_analog(ANALOG_LEFT_Y);
-                double rightY = mainController.get_analog(ANALOG_RIGHT_Y);
-                
-                // Normalize to [-1.0, 1.0]
-                leftY /= 127.0;
-                rightY /= 127.0;
-            
+
                 // Move chassis based on joystick inputs
                 chassis.moveTank(
-                    leftY,  // Left Forward/backward speed [-1.0 to 1.0]
-                    rightY  // Right Forward/backward speed [-1.0 to 1.0]
+                    mainController.leftY,   // Left forward/backward speed [-1.0 to 1.0]
+                    mainController.rightY  // Right forward/backward speed [-1.0 to 1.0]
                 );
-            
-                // Delay to prevent the CPU from being overloaded
-                pros::delay(20);
+
+                // ...
             }
         }
         ```
     </TabItem>
 </Tabs>
-
-## Configuration
-
-### Brake Mode
-
-By default, `SmartMotorGroup` motors are set to `coast` mode after they are passed into a `TankChassis`.
-While this is configurable, it is **highly recommended** to keep the drivetrain motors in `coast` mode to prevent Smart Motors from overheating during matches.
-
-```cpp
-void initialize() {
-    // Enable brake mode on drivetrain motors
-    // DO NOT do this unless you know what you are doing!
-    leftMotors.setBrakeMode(true);
-    rightMotors.setBrakeMode(true);
-
-    // ...
-}
-```

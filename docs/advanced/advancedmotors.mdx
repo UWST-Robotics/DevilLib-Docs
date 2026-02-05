@@ -1,0 +1,46 @@
+---
+sidebar_position: 2
+---
+
+# SmartMotors (Advanced)
+
+## Thermal Throttling
+As motors accelerate and decelerate, their coils generate a lot of heat.
+This heat is naturally dissipated over time, but if too much build up in a VEX SmartMotor then the power is throttled until they're cooled back down.
+
+
+| Motor Temp          | Torque Limit          |
+|-----                |-----                  |
+| 50°C *(120°F)*      | 50%                   |
+| 60°C *(140°F)*      | 25%                   |
+| 65°C *(150°F)*      | 12.5%                 |
+| 70°C *(160°F)*      | 0% *(Motor Disabled)* |
+
+You can also monitor the motor temperature in DevilLib.
+
+```cpp
+// Gets the motor temperature in celsius (with 5deg of resolution)
+float motorTemperature = sampleMotor.getTemperature();
+```
+
+## Current Limiting
+In addition to thermal throttling, VEX SmartMotors also throttle depending on the amount of connected motors the VEX V5 brain currently has connected.
+Due to V5RC's 8 motor limit, this is only applicable to VURC teams.
+
+The current limit of each motor in amps ($C_{limit}$) based on the total number of SmartMotors connected to the brain ($M_{count}$) can be calculated with the following:
+
+$$
+C_{limit} = 0.925 * \log_e\frac{12800}{M_{count}} - 4.324
+$$
+
+Each motor is capped at **2.5A** each.
+
+If a custom current limit is set by the user, that is prioritized *(if it smaller than that the existing limit)*.
+Doing so shares unused battery current with the other motors.
+
+```cpp
+// Set a 1.5A current limit
+sampleMotor.setCurrentLimit(1.0f);
+```
+
+[Source: VEX Forum](https://www.vexforum.com/t/how-does-the-decreased-current-affect-the-robot-when-using-more-than-8-motors/72650/16)

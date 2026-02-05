@@ -2,12 +2,83 @@
 sidebar_position: 3
 ---
 
-# 3 - Odometry
-
-## Initialization
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
+# 3 - Odometry
+
+## Whats an odometry?
+Odometry is "the use of data from motion sensors to estimate change in position over time." (Wikipedia)
+
+Odometry allows the robot to know where it is on the field at any given time.
+This enables the robot to automagically correct itself if it drifts off it's autonomous course.
+
+<ThemedImage
+  alt="Odometry Example"
+  sources={{
+    light: useBaseUrl('/img/OdomExample-Light.png'),
+    dark: useBaseUrl('/img/OdomExample-Dark.png'),
+  }}
+/>
+
+## How do?
+
+Theres a huge variety of methods for calculating the odometry, each with their own strengths and weaknesses.
+
+<Tabs groupId="odometry-method">
+
+    <TabItem value="drivetrain" label="Drivetrain Encoder" default>
+
+        The easiest solution is to use the encoders that are also built in the robot's drivetrain.
+        By tracking how much the wheels of a robot rotate, we can use trigonometry to figure out how far the robot has driven from its starting point.
+
+        :::warning
+        This method relies on the drive wheels having good contact and friction with the ground which is almost never the case.
+        Drive wheels can and will slip a significant amount during the course of an autonomous run.
+
+        DO NOT rely on this method for long or complex autonomous routines.
+
+        If you're going to use this method, keep the robot slow, minimize sharp accelerations/turns, and use an IMU to help.
+        :::
+
+        ### Example Code
+
+        ```cpp
+        // Make sure there is a tank chassis defined
+        TankChassis chassis = TankChassis(leftMotors, rightMotors);
+
+        // Define the radius of the drivetrain wheels (in inches)
+        static constexpr float WHEEL_RADIUS = 1.0f; // in
+
+        // Define the width of the drivetrain (in inches)
+        static constexpr float WHEEL_BASE = 12.0f; // in
+
+        // Create a Tank Chassis odometry object
+        // (Since TankChassisOdom is an AsyncTask, we must use a shared pointer)
+        std::shared_ptr<TankChassisOdom> odom = std::make_shared<TankChassisOdom>(
+            chassis,
+            WHEEL_RADIUS,
+            WHEEL_BASE);
+
+        MyRobot()
+        {
+            odom.setTicksPerRevolution(300); // <-- Change based on your robot's gear ratio
+            //odom.useIMU(&imu);             // <-- Uncomment to use an IMU for odometry
+
+            // ...
+        }
+
+        ```
+
+
+    </TabItem>
+    <TabItem value="deadwheels" label="Dead Wheels" default>
+    </TabItem>
+</Tabs>
+
+## Example
 
 <Tabs groupId="odometry-type">
 

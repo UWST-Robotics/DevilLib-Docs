@@ -1,11 +1,11 @@
 ---
-sidebar_position: 5
+sidebar_position: 3
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import ThemedImage from '@theme/ThemedImage';
 
-# 5 - Joystick Curve
+# Joystick Curve
 
 ## The Problem
 
@@ -67,6 +67,16 @@ class MyRobot : Robot
     // ...
 }
 ```
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| Deadzone  | This is the smallest possible input the joystick can produce. Try to keep this as small as possible.                            |
+| Starting Value | This is the amount of power that the joystick will produce initially. This should be just barely enough to see the motors move. |
+| Ending Value | This is the maximum amount of power that the joysticks will output. For example, this can be set to 50% for the steering for more fine control. Otherwise, this can be kept at 100%. |
+| Exponent | This is the amount of curve the line has. A value of 1 is linear, a value between 0 and 1 will curve the line upward, and a value greater than 1 will curve the line downward.
+
 <ThemedImage
   alt="Curved Joystick Parameters"
   sources={{

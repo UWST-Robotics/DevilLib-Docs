@@ -1,0 +1,76 @@
+---
+sidebar_position: 2
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
+# PID
+
+## What is PID?
+
+PID is one of the most common examples of a closed loop control system (feedback controller).
+
+The name PID comes from its parts: P, I, and D which stand for proportional, integral, and derivative.
+If you've done any calculus, these values should look somewhat familiar.
+
+$$$
+output = P + I + D
+$$$
+
+### P (Proportion)
+This is the main part of PID. The larger the error is, the more the robot moves to compensate.
+
+$$$
+P = P_{gain} * error
+$$$
+
+### I (Integral)
+
+$$$
+I = I_{gain} + \int error
+$$$
+
+### D (Derivative)
+
+
+$$$
+D = D_{gain} * \Delta error
+$$$
+
+## Example
+
+```cpp
+// Make a PID controller with the following gains:
+// P_gain = 0.006
+// I_gain = 0
+// D_gain = 0.01
+PIDController pidController = PIDController(0.006f, 0.0f, 0.01f);
+
+void opcontrol() override
+{
+    while (true) {
+        // Define the expected position of the motor encoder (in ticks)
+        float expectedPosition = 1000.0f;
+
+        // Get the actual position of the motor encoder (in ticks)
+        float actualPosition = sampleMotor.getPosition();
+
+        // Error is the difference between these two
+        // (How far away are we from our expected position)
+        float error = expectedPosition - actualPosition;
+
+        // Update the PID Controller
+        float output = pidController.update(error);
+
+        // Move the motor based on the PID output
+        sampleMotor.move(output);
+
+        // ...
+    }
+}
+```
+
+### PID Tuning

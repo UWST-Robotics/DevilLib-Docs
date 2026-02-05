@@ -1,0 +1,47 @@
+---
+sidebar_position: 1
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
+# Control Loops
+
+## What are control loops?
+
+Control loops are the secret sauce that separate the good robots from the great robots.
+These define the predictions being made when a robot moved autonomously and how we can use them to our advantage.
+
+## Open Loop (Feedforward)
+
+An open loop is a control system that works independently without the use of sensory feedback.
+It typically uses a prediction or "model" of what should happen to make reasonable assumptions.
+
+<ThemedImage
+  alt="Open Loop (Feedforward)"
+  sources={{
+    light: useBaseUrl('/img/FeedforwardExample-Light.png'),
+    dark: useBaseUrl('/img/FeedforwardExample-Dark.png'),
+  }}
+/>
+
+An example of an open loop control is driving forward for 3 seconds.
+It is reasonable to assume the robot would end up a certain distance forward than it started with.
+The exact distance can vary depending on how fast the robot moves, how charged the batteries are, etc.
+
+## Closed Loops (Feedback)
+
+A closed loop is a control system that is dependent on sensory feedback to adjust itself.
+
+<ThemedImage
+  alt="Closed Loop (Feedback)"
+  sources={{
+    light: useBaseUrl('/img/FeedbackExample-Light.png'),
+    dark: useBaseUrl('/img/FeedbackExample-Dark.png'),
+  }}
+/>
+
+An example of a closed loop control is driving forward until the wheels have rotated 10 times.
+In this case, the robot should drive approximately the same amount of distance every time.
