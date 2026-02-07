@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 2
 ---
 
 # 2 - Drivetrain Chassis
@@ -9,7 +9,6 @@ import TabItem from '@theme/TabItem';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import ThemedImage from '@theme/ThemedImage';
 
-### Initialization
 <Tabs>
     <TabItem value="tank" label="Tank" default>
         <ThemedImage
@@ -26,6 +25,13 @@ import ThemedImage from '@theme/ThemedImage';
         - The robot can move **forward/backward** by moving the wheels forward/backward
         - The robot can **rotate** by moving the wheels opposite of each other.
 
+        | Pros ✅ | Cons ❌ |
+        |---|---|
+        | - Simple <br></br> - Full power/traction | - No strafe 😞 |
+
+
+        ### Example Code
+
         ```cpp
         // Define SmartMotorGroups for left and right motors
         SmartMotorGroup leftMotors = SmartMotorGroup("LeftMotors", {1, -2, 3});
@@ -35,17 +41,108 @@ import ThemedImage from '@theme/ThemedImage';
         TankChassis chassis = TankChassis(leftMotors, rightMotors);
         ```
     </TabItem>
-    <TabItem value="xdrive" label="X-Drive" default>
-        *Not yet implemented*
-    </TabItem>
     <TabItem value="hdrive" label="H-Drive" default>
-        *Not yet implemented*
+        <ThemedImage
+          alt="H-Drive"
+          sources={{
+            light: useBaseUrl('/img/HDrive-Light.png'),
+            dark: useBaseUrl('/img/HDrive-Dark.png'),
+          }}
+        />
+         ```cpp
+        // Define SmartMotorGroups for left motors, right motors, and center motor
+        // (SmartMotorGroups can just have a single motor)
+        SmartMotorGroup leftMotors = SmartMotorGroup("LeftMotors", {1, -2});
+        SmartMotorGroup rightMotors = SmartMotorGroup("RightMotors", {-3, 4});
+        SmartMotorGroup centerMotor = SmartMotorGroup("CenterMotor", {5});
+
+        // Create an HDriveChassis using the defined motor groups
+        HDriveChassis chassis = HDriveChassis(leftMotors, rightMotors, centerMotor);
+        ```
+    </TabItem>
+    <TabItem value="xdrive" label="X-Drive" default>
+        <ThemedImage
+          alt="X-Drive"
+          sources={{
+            light: useBaseUrl('/img/XDrive-Light.png'),
+            dark: useBaseUrl('/img/XDrive-Dark.png'),
+          }}
+        />
+         ```cpp
+        // Define SmartMotorGroups for each corner
+        // (SmartMotorGroups can just have a single motor)
+        SmartMotorGroup frontLeftMotor = SmartMotorGroup("FrontLeftMotor", {1});
+        SmartMotorGroup frontRightMotor = SmartMotorGroup("FrontRightMotor", {2});
+        SmartMotorGroup backLeftMotor = SmartMotorGroup("BackLeftMotor", {3});
+        SmartMotorGroup backRightMotor = SmartMotorGroup("BackRightMotor", {4});
+
+        // Create an XDriveChassis using the defined motor groups
+        XDriveChassis chassis = XDriveChassis(
+            frontLeftMotor,
+            frontRightMotor,
+            backLeftMotor,
+            backRightMotor
+        );
+        ```
     </TabItem>
     <TabItem value="mecanum" label="Mecanum" default>
-        *Not yet implemented*
+        <ThemedImage
+          alt="Mecanum Drive"
+          sources={{
+            light: useBaseUrl('/img/MecanumDrive-Light.png'),
+            dark: useBaseUrl('/img/MecanumDrive-Dark.png'),
+          }}
+        />
+         ```cpp
+        // Define SmartMotorGroups for each corner
+        // (SmartMotorGroups can just have a single motor)
+        SmartMotorGroup frontLeftMotor = SmartMotorGroup("FrontLeftMotor", {1});
+        SmartMotorGroup frontRightMotor = SmartMotorGroup("FrontRightMotor", {2});
+        SmartMotorGroup backLeftMotor = SmartMotorGroup("BackLeftMotor", {3});
+        SmartMotorGroup backRightMotor = SmartMotorGroup("BackRightMotor", {4});
+
+        // Create an MecanumChassis using the defined motor groups
+        MecanumChassis chassis = MecanumChassis(
+            frontLeftMotor,
+            frontRightMotor,
+            backLeftMotor,
+            backRightMotor
+        );
+        ```
     </TabItem>
     <TabItem value="swerve" label="Swerve" default>
-        *Not yet implemented*
+        <ThemedImage
+          alt="Swerve"
+          sources={{
+            light: useBaseUrl('/img/Swerve-Light.png'),
+            dark: useBaseUrl('/img/Swerve-Dark.png'),
+          }}
+        />
+
+        | Pros ✅ | Cons ❌ |
+        |---|---|
+        | - Full power/traction in every direction <br></br> - Complete meneuverability | - Mechanically complex <br></br> - Requires 8 motors and 4 potentiometers |
+
+         ```cpp
+        // Define DifferentialSwerveModules for each corner
+
+        // Front Left Module
+        SmartMotorGroup frontLeftMotorA = SmartMotorGroup("FrontLeftMotorA", {1});
+        SmartMotorGroup frontLeftMotorB = SmartMotorGroup("FrontLeftMotorB", {2});
+        ADIAnalogIn frontLeftPotentiometer = ADIAnalogIn("FrontLeftSensor", 1); // <-- potentiometer to track the rotation of the module
+
+        DifferentialSwerveModule frontLeftModule = DifferentialSwerveModule(
+            frontLeftMotorA, frontLeftMotorB, frontLeftPotentiometer
+        );
+
+        // (Repeat for each module)
+        // ...
+
+        // Create an SwerveChassis using the defined swerve modules
+        SwerveChassis chassis = SwerveChassis(
+            frontLeftModule, frontRightModule, backLeftModule, backRightModule
+        );
+        ```
     </TabItem>
 </Tabs>
 
@@ -68,10 +165,10 @@ import ThemedImage from '@theme/ThemedImage';
 
         Arcade controls allow the robot to be driven using a horizontal and vertical joystick input.
 
+
         ```cpp
         void opcontrol() {
             while (true) {
-
                 // Move chassis based on joystick inputs
                 chassis.move(
                     mainController.leftY,  // Forward/backward speed [-1.0 to 1.0]
@@ -94,15 +191,17 @@ import ThemedImage from '@theme/ThemedImage';
         />
 
         Split arcade controls are similar to arcade, but split across 2 different joysticks.
+        This allows the driver to use both hands when driving the robot at the expense of an additional joystick input.
+
+       This is often more familiar to drivers since it mimics popular video games that use the left joystick for movement and the right joystick to aim/look.
 
         ```cpp
         void opcontrol() {
             while (true) {
-
                 // Move chassis based on joystick inputs
                 chassis.move(
                     mainController.leftY,  // Forward/backward speed [-1.0 to 1.0]
-                    mainController.rightX,  // Turning speed [-1.0 to 1.0]
+                    mainController.rightX, // Turning speed [-1.0 to 1.0]
                     0
                 );
 
@@ -112,10 +211,6 @@ import ThemedImage from '@theme/ThemedImage';
         ```
     </TabItem>
     <TabItem value="tank" label="Tank" default>
-        :::warning
-        This is only applicable to tank drive chassis.
-        :::
-
         <ThemedImage
           alt="Tank Controls"
           sources={{
@@ -124,15 +219,19 @@ import ThemedImage from '@theme/ThemedImage';
           }}
         />
 
+        :::note
+        This is only applicable to a **tank drive** chassis.
+        :::
+
         Tank controls allow the robot to be driven using two separate joystick inputs for the left and right sides.
+        This gives the driver more direct control over the drivetrain, but is less intuitive to use.
 
         ```cpp
         void opcontrol() {
             while (true) {
-
                 // Move chassis based on joystick inputs
                 chassis.moveTank(
-                    mainController.leftY,   // Left forward/backward speed [-1.0 to 1.0]
+                    mainController.leftY,  // Left forward/backward speed [-1.0 to 1.0]
                     mainController.rightY  // Right forward/backward speed [-1.0 to 1.0]
                 );
 

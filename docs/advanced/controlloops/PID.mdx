@@ -74,3 +74,33 @@ void opcontrol() override
 ```
 
 ### PID Tuning
+
+:::note
+This is just one of many strategies for tuning a PID controller, but it is by far the most common.
+Depending on your situation, this guide may or may not work for your specific application.
+:::
+
+#### 1. Set P, I, and D gains to 0
+#### 2. Gradually increase the P gain until you see oscillation
+
+Initially, you should see the mechanism slowly approaching its target speed/position.
+As you increase the P gain more, it'll approach more quickly.
+This results in the mechanism oscillating back and forth around the target as it repeatedly overshoots.
+
+If the mechanism is oscillating uncontrollably, then the P gain is too high.
+
+#### 3. Gradually increase the D gain until the oscillations are eliminated
+
+Remember, the D gain will slow the mechanism down if its going too fast.
+
+If you see the mechanism oscillate **before** it reaches its target point, then the D gain is too high.
+
+#### 4. Gradually increase the P and D gains until the mechanism quickly reaches its target point without oscillating
+
+Make sure to test different starting points and different target points.
+What might work for one position may not work for other positions.
+
+#### 5. Evaluate whether or not you need I gain
+
+The I gain may not be applicable for the majority of situations.
+If you're finding that the mechanism is struggling to reach the target point after tuning, perhaps you should be using a [feedforward controller](feedforward.mdx)?

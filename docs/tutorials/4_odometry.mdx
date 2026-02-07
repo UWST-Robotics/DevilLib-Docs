@@ -7,9 +7,8 @@ import TabItem from '@theme/TabItem';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import ThemedImage from '@theme/ThemedImage';
 
-# 3 - Odometry
+# 4 - Odometry
 
-## Whats an odometry?
 Odometry is "the use of data from motion sensors to estimate change in position over time." (Wikipedia)
 
 Odometry allows the robot to know where it is on the field at any given time.
@@ -27,9 +26,17 @@ This enables the robot to automagically correct itself if it drifts off it's aut
 
 Theres a huge variety of methods for calculating the odometry, each with their own strengths and weaknesses.
 
-<Tabs groupId="odometry-method">
+<Tabs groupId="odometry-type">
 
     <TabItem value="drivetrain" label="Drivetrain Encoder" default>
+
+        <ThemedImage
+          alt="Tank Drive Odometry Parameters"
+          sources={{
+            light: useBaseUrl('/img/TankDriveOdomParams-Light.png'),
+            dark: useBaseUrl('/img/TankDriveOdomParams-Dark.png'),
+          }}
+        />
 
         The easiest solution is to use the encoders that are also built in the robot's drivetrain.
         By tracking how much the wheels of a robot rotate, we can use trigonometry to figure out how far the robot has driven from its starting point.
@@ -52,7 +59,7 @@ Theres a huge variety of methods for calculating the odometry, each with their o
         // Define the radius of the drivetrain wheels (in inches)
         static constexpr float WHEEL_RADIUS = 1.0f; // in
 
-        // Define the width of the drivetrain (in inches)
+        // Define the distance between the left and right drivetrain wheels (in inches)
         static constexpr float WHEEL_BASE = 12.0f; // in
 
         // Create a Tank Chassis odometry object
@@ -60,54 +67,26 @@ Theres a huge variety of methods for calculating the odometry, each with their o
         std::shared_ptr<TankChassisOdom> odom = std::make_shared<TankChassisOdom>(
             chassis,
             WHEEL_RADIUS,
-            WHEEL_BASE);
-
-        MyRobot()
-        {
-            odom.setTicksPerRevolution(300); // <-- Change based on your robot's gear ratio
-            //odom.useIMU(&imu);             // <-- Uncomment to use an IMU for odometry
-
-            // ...
-        }
-
-        ```
-
-
-    </TabItem>
-    <TabItem value="deadwheels" label="Dead Wheels" default>
-    </TabItem>
-</Tabs>
-
-## Example
-
-<Tabs groupId="odometry-type">
-
-    <TabItem value="perpendicular" label="Perpendicular" default>
-        ```cpp
-        // Define rotation sensors for odometry wheels
-        RotationSensor verticalOdomWheel = RotationSensor("VerticalOdomWheel", 10);
-        RotationSensor horizontalOdomWheel = RotationSensor("HorizontalOdomWheel", 11);
-
-        // Define the radius of the dead wheels (in inches)
-        static constexpr double DEAD_WHEEL_RADIUS = 1.0; // in
-
-        // Create a perpendicular sensor odometry object
-        // (Since PerpendicularSensorOdometry is an AsyncTask, we must use a shared pointer)
-        PerpendicularSensorOdometry odometry = PerpendicularSensorOdometry(
-            verticalOdomWheel,
-            horizontalOdomWheel,
-            DEAD_WHEEL_RADIUS
+            WHEEL_BASE
         );
 
-        // Run odometry in a background task
-        void initialize() {
-            odometry.start();
+        MyRobot() {
+            odom.setTicksPerRevolution(300); // <-- Change based on your robot's gear ratio
+            // ...
         }
         ```
     </TabItem>
+    <TabItem value="parallel" label="Parallel Dead Wheels">
 
-    <TabItem value="parallel" label="Parallel">
-        ```cpp        
+        <ThemedImage
+          alt="Parallel Odom"
+          sources={{
+            light: useBaseUrl('/img/ParallelOdom-Light.png'),
+            dark: useBaseUrl('/img/ParallelOdom-Dark.png'),
+          }}
+        />
+
+        ```cpp
         // Define rotation sensors for odometry wheels
         RotationSensor leftOdomWheel = RotationSensor("LeftOdomWheel", 10);
         RotationSensor rightOdomWheel = RotationSensor("RightOdomWheel", 11);
@@ -126,10 +105,56 @@ Theres a huge variety of methods for calculating the odometry, each with their o
             DEAD_WHEEL_RADIUS,
             DEAD_WHEEL_BASE
         );
+        ```
+    </TabItem>
+    <TabItem value="perpendicular" label="Perpendicular Dead Wheels" default>
 
-        // Run odometry in a background task
-        void initialize() {
-            odometry.start();
+        <ThemedImage
+          alt="Perpendicular Odom"
+          sources={{
+            light: useBaseUrl('/img/PerpendicularOdom-Light.png'),
+            dark: useBaseUrl('/img/PerpendicularOdom-Dark.png'),
+          }}
+        />
+
+        ```cpp
+        // Define rotation sensors for odometry wheels
+        RotationSensor verticalOdomWheel = RotationSensor("VerticalOdomWheel", 10);
+        RotationSensor horizontalOdomWheel = RotationSensor("HorizontalOdomWheel", 11);
+
+        // Define the radius of the dead wheels (in inches)
+        static constexpr double DEAD_WHEEL_RADIUS = 1.0; // in
+
+        // Create a perpendicular sensor odometry object
+        // (Since PerpendicularSensorOdometry is an AsyncTask, we must use a shared pointer)
+        std::shared_ptr<PerpendicularSensorOdometry> odometry = std::make_shared<PerpendicularSensorOdometry>(
+            verticalOdomWheel,
+            horizontalOdomWheel,
+            DEAD_WHEEL_RADIUS
+        );
+        ```
+
+        ### Rotational Compensation
+
+        When the robot rotates, the perpendicular orientation of the odometry wheels can inadvertently cause lateral movement readings.
+        To correct for this, you can set the offsets of the odometry sensors relative to the robot's center of rotation.
+
+        These are defined as `Vector2` objects, where the x-coordinate represents the horizontal offset (left/right) and the y-coordinate represents the vertical offset (forward/backward).
+
+        :::note
+        You may have to manually tune these values based on the position and grip of your odometry wheels.
+        :::
+
+        ```cpp
+        // Offset values for the odometry sensors, relative to the robot's center of rotation (in inches)
+        Vector2 verticalSensorOffset = Vector2(-0.5, 0);    // (Y position is disregarded)
+        Vector2 horizontalSensorOffset = Vector2(0, 1);     // (X position is disregarded)
+
+        MyRobot() {
+            // Apply the offsets for odometry calculations
+            odometry.setSensorOffsets(verticalSensorOffset, horizontalSensorOffset);
+
+            // ...
         }
         ```
     </TabItem>
@@ -157,9 +182,7 @@ void opcontrol() {
 }
 ```
 
-## Configuration
-
-### Inertial Sensor
+## Inertial Sensor
 
 An Inertial Sensor (IMU) can be used to improve the accuracy of odometry calculations by providing accurate orientation data that drifts significantly less over time.
 While optional, it is **highly recommended** to use an IMU for the best performance.
@@ -168,46 +191,10 @@ While optional, it is **highly recommended** to use an IMU for the best performa
 // Define the Inertial Sensor
 InertialSensor imu = InertialSensor("IMU", 15);
 
-void initialize() {
+MyRobot() {
     // Use the IMU for odometry calculations
     odometry.useIMU(&imu);
 
     // ...
 }
 ```
-
-### Rotational Compensation
-
-<Tabs groupId="odometry-type">
-
-    <TabItem value="perpendicular" label="Perpendicular" default>
-        When the robot rotates, the perpendicular orientation of the odometry wheels can inadvertently cause lateral movement readings.
-        To correct for this, you can set the offsets of the odometry sensors relative to the robot's center of rotation.
-
-        These are defined as `Vector2` objects, where the x-coordinate represents the horizontal offset (left/right) and the y-coordinate represents the vertical offset (forward/backward).
-
-        :::note
-        You may have to manually tune these values based on the position and grip of your odometry wheels.
-        :::
-
-        ```cpp
-        // Offset values for the odometry sensors, relative to the robot's center of rotation (in inches)
-        Vector2 verticalSensorOffset = Vector2(-0.5, 0);    // (Y position is disregarded)
-        Vector2 horizontalSensorOffset = Vector2(0, 1);     // (X position is disregarded)
-
-        void initialize() {
-            // Apply the offsets for odometry calculations
-            odometry.setSensorOffsets(verticalSensorOffset, horizontalSensorOffset);
-
-            // ...
-        }
-
-        ```
-    </TabItem>
-
-    <TabItem value="parallel" label="Parallel">
-        :::tip[You don't need this with Parallel Odom Wheels]
-        Rotational compensation is not required for Parallel Sensor Odometry since the odometry wheels will not produce inadvertent lateral movement readings when the robot rotates.
-        :::
-    </TabItem>
-</Tabs>
