@@ -29,6 +29,7 @@ const config = {
             /** @type {import('@docusaurus/preset-classic').Options} */
             ({
                 docs: {
+                    routeBasePath: '/',
                     sidebarPath: './sidebars.js',
                     editUrl: 'https://github.com/UWST-Robotics/DevilLib-Docs/',
 
@@ -69,53 +70,19 @@ const config = {
                 },
                 items: [
                     {
-                        type: 'docSidebar',
-                        sidebarId: 'gettingStartedSidebar',
-                        position: 'left',
-                        label: 'Getting Started',
-                    },
-                    {
                         href: 'https://github.com/UWST-Robotics/DevilLib',
-                        label: 'GitHub',
                         position: 'right',
+                        className: 'navbar-github-link',
                     },
                 ],
             },
             footer: {
                 style: 'dark',
                 links: [
-                    {
-                        title: 'Docs',
-                        items: [
-                            {
-                                label: 'Getting Started',
-                                to: '/docs/getting-started',
-                            },
-                        ],
-                    },
-                    {
-                        title: 'Community',
-                        items: [
-                            {
-                                label: 'Instagram',
-                                href: 'https://www.instagram.com/devilbots.vexu/',
-                            },
-                            {
-                                label: 'YouTube',
-                                href: 'https://www.youtube.com/@StoutDevilBots',
-                            }
-                        ],
-                    },
-                    {
-                        title: 'More',
-                        items: [
-                            {
-                                label: 'GitHub',
-                                href: 'https://github.com/UWST-Robotics/DevilLib-Docs',
-                            },
-                        ],
-                    },
-                ],
+                    {label: "DevilLib", href: "/"},
+                    {label: "GitHub", href: "https://github.com/UWST-Robotics/DevilLib"},
+                    {label: "Email", href: "mailto:robotics@uwstout.edu"}
+                ]
             },
             prism: {
                 theme: prismThemes.github,
