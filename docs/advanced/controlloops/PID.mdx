@@ -15,30 +15,63 @@ PID is one of the most common examples of a closed loop control system (feedback
 
 The name PID comes from its parts: P, I, and D which stand for proportional, integral, and derivative.
 If you've done any calculus, these values should look somewhat familiar.
+Though, you do not need to know any calculus to understand how PID works.
 
 $$$
 output = P + I + D
 $$$
 
 ### P (Proportion)
-This is the main part of PID. The larger the error is, the more the robot moves to compensate.
+This is the main part of PID.
+The larger the error is, the more the robot moves to compensate.
 
 $$$
 P = P_{gain} * error
 $$$
 
+For some applications, this is the only part of PID that is necessary.
+However, this can lead to oscillations around the target point since the robot will overshoot and then have to correct itself back and forth.
+
+### D (Derivative)
+
+We're going to skip I for now and come back to it later.
+
+The D in PID stands for "derivative" (aka - *how fast is our error moving*).
+This is used to slow the robot down if it's moving too fast.
+The faster the error is changing, the more the robot will slow down the output to compensate.
+This is useful to prevent overshooting and oscillations around the target point.
+
+$$$
+D = D_{gain} * \Delta error
+$$$
+
 ### I (Integral)
+
+With just P and D, the robot may struggle to reach the target point due to a phenomenon called **steady state error**.
+This is due to the fact that as the robot gets closer to the target point, the error gets smaller, which means the P gain has less and less effect on the robot's movement.
+
+:::tip[Example]
+Lets say you have a flywheel that you want to maintain at a certain speed.
+The error in this case is the difference between the target speed and the actual speed.
+As the flywheel gets closer to the target speed, the error gets smaller, which means both P and D approach zero.
+Since the flywheel is fighting friction, air resistance, and other forces, it'll likely never be able to reach the target speed, let alone maintain it.
+:::
+
+This is where the I gain comes in.
+
+The I gain is used to accumulate the error over time, which allows the robot to compensate for steady state error.
+The longer the robot struggles to reach the target point, the more the I gain will accumulate, which will eventually allow the robot to reach the target point.
 
 $$$
 I = I_{gain} + \int error
 $$$
 
-### D (Derivative)
+:::warning
+Be careful when using the I gain, as it can lead to another phenomenon called **integral windup**.
+This is where the I gain accumulates too much error and causes the robot to overshoot and oscillate uncontrollably.
 
-
-$$$
-D = D_{gain} * \Delta error
-$$$
+If you're finding that the mechanism is struggling to reach the target point after tuning, perhaps you should be using a [feedforward controller](feedforward.mdx)?
+:::
 
 ## Example
 

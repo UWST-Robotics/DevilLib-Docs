@@ -20,6 +20,7 @@ import ThemedImage from '@theme/ThemedImage';
         />
 
         A `MotorFeedforward` is the baseline feedforward and can be used when there are no external forces acting on the mechanism.
+        An example of this would be a the robot drivetrain, where the motors only have to fight against friction and inertia.
         If your motors are constantly fighting against gravity, an `ElevatorFeedforward` might be a better option.
 
         ```cpp
@@ -100,8 +101,8 @@ import ThemedImage from '@theme/ThemedImage';
 
         An `ArmFeedforward` can be used when the force of gravity changes depending on the rotation of the mechanism.
 
-        For example, when the arm is all the way down or all the way up, the force of gravity is overcome by the mechanism's internal structure.
-        The arm motor(s) have to fight against the most amount of gravity when the arm is fully horizontal.
+        For example, when the arm is all the way down or all the way up, the force of gravity is negated by the mechanism's internal structure.
+        When the arm motor is fully horizontal, the arm motor(s) have to fight against the maximum amount of gravity.
 
         ```cpp
         // Create the feedforward controller

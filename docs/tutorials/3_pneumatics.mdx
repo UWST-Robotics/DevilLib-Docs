@@ -2,18 +2,60 @@
 sidebar_position: 3
 ---
 
-# 3 - Pneumatics
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
+# 3 - Sensors/Actuators
+
+## Pneumatics
+
+In a typical pneumatic configuration, you'll have a solenoid connected to the brain using the ADI (3-wire) ports.
+The solenoid actuates a pneumatic piston by controlling the flow of air to/from the piston.
+
+For more detailed information on pneumatics, check out [VEX's knowledge base articles on pneumatics](https://kb.vex.com/hc/en-us/articles/17193212326036-Example-V5-Pneumatics-Kit-Configurations).
+<ThemedImage
+  alt="Pneumatics"
+  sources={{
+    light: useBaseUrl('/img/Pneumatics-Light.png'),
+    dark: useBaseUrl('/img/Pneumatics-Dark.png'),
+  }}
+/>
+
+You can control a pneumatic solenoid  (and, by extension, the piston) by making an `ADIPneumatic`.
 
 ```cpp
 // Define a pneumatic
-ADIPneumatic samplePneumatic = ADIPneumatic("SamplePneumatic", -2);
+ADIPneumatic samplePneumatic = ADIPneumatic(
+    "SamplePneumatic",  // <-- Name of the pneumatic (for logging purposes)
+    'B',                // <-- ADI port the pneumatic is connected to (A, B, C, D, E, F, G, H)
+    false               // <-- Optional: Whether or not the solenoid is reversed (defaults to false)
+);
+
+void opcontrol() override {
+    samplePneumatic.extend();
+    samplePneumatic.retract();
+
+    samplePneumatic.setExtended(true);
+    samplePneumatic.setExtended(false);
+
+    // ...
+}
 ```
 
-## Pneumatic Group
+### Pneumatic Group
+
+If you have multiple solenoids you want to control together, you can make an `ADIPneumaticGroup` to control them all at once.
 
 ```cpp
 ADIPneumaticGroup samplePneumaticGroup = ADIPneumaticGroup(
-    "SamplePneumaticGroup",
-    {1, 2, 3}
+    "SamplePneumaticGroup", // <-- Name of the pneumatic group (for logging purposes)
+    {'A', 'B', 'C'}         // <-- List the ADI ports of each pneumatic in the group
 );
+
+void opcontrol() override {
+    samplePneumatic.extend();
+    samplePneumatic.retract();
+
+    // ...
+}
 ```

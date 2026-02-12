@@ -2,13 +2,14 @@
 sidebar_position: 2
 ---
 
-# 2 - Drivetrain Chassis
+# 2 - Drivetrain
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import ThemedImage from '@theme/ThemedImage';
 
+## Drivetrain Types
 <Tabs>
     <TabItem value="tank" label="Tank" default>
         <ThemedImage
@@ -151,7 +152,7 @@ import ThemedImage from '@theme/ThemedImage';
     That is, they can move forwards, backwards, **and sideways**.
 :::
 
-### Controls
+## Controls
 
 <Tabs>
     <TabItem value="arcade" label="Arcade" default>
@@ -241,3 +242,11 @@ import ThemedImage from '@theme/ThemedImage';
         ```
     </TabItem>
 </Tabs>
+
+### Joystick Curving
+By default, joystick inputs are linear.
+This means that if you push the joystick halfway forward, the robot will move at half speed.
+However, this can make it difficult to control the robot at low speeds since the window for input values is very small.
+DevilLib includes built-in support for curving joystick inputs to give the driver more control at low speeds.
+
+You can read more about this in the [joystick curving guide](/advanced/joystickcurve).

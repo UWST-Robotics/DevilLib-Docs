@@ -72,6 +72,7 @@ Theres a huge variety of methods for calculating the odometry, each with their o
 
         MyRobot() {
             odom.setTicksPerRevolution(300); // <-- Change based on your robot's gear ratio
+
             // ...
         }
         ```
@@ -170,12 +171,6 @@ void opcontrol() {
     while (true) {
         // Get the current pose of the robot
         Pose pose = odometry.getPose();
-        std::cout << "X: " << pose.x << " Y: " << pose.y << " Heading: " << pose.heading << std::endl;
-
-        // Example: Resetting the robot's pose when a button is pressed
-        bool resetPose = mainController.get_digital(DIGITAL_A);
-        if (resetPose)
-            odometry.setPose(Pose(0, 0, 0));
 
         // ...
     }
