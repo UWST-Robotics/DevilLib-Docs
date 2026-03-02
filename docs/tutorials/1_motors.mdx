@@ -1,0 +1,174 @@
+---
+sidebar_position: 1
+---
+
+# 1 - Motors
+
+Believe it or not...motors...*make robots move!*
+
+Crazy, I know. This is some riveting information.
+
+Joking aside, your robot will probably use a lot of these, so it's important to know all the components, capabilities, and limitations of VEX's SmartMotor system.
+
+
+### Example
+
+```cpp
+// Create a SmartMotor object called "sampleMotor"
+SmartMotor sampleMotor = SmartMotor(
+    "MotorName", // <-- This is a name for the motor for logging purposes
+    1            // <-- This is the port written on the VEX brain that the motor is connected to
+);
+
+void opcontrol() override
+{
+    while (true)
+    {
+        // Get the up/down input from the left joystick
+        // This is a value from -1 to 1 representing 100% down and 100% up
+        float joystickInput = mainController.leftY;
+
+        // Moves the motor when you move the left joystick up and down
+        // This is a value from -1 to 1 representing 100% reverse and 100% forwards
+        sampleMotor.move(joystickInput);
+
+        // For example,
+        //  -1   (-100%) will go reverse at full speed
+        //  -0.5 (-50%)  will go reverse at 50% speed
+        //  0    (0%)    will stop the motor
+        //  0.5  (50%)   will go forwards at 50% speed
+        //  1    (100%)  will go forwards at full speed
+
+        // ...
+    }
+}
+```
+
+## Motor Encoders
+
+VEX's SmartMotors have a neat little feature that most DC motors don't have; and thats a built-in **motor encoder**.
+
+A motor encoder is a sensor that detects how much the motor has actually moved.
+
+```cpp
+// 1800 ticks/rev for 36:1 gears (11W)
+// 900 ticks/rev for 18:1 gears (11W OR 5.5W)
+// 300 ticks/rev for 6:1 gears (11W)
+
+// Print the current encoder position in ticks to the screen
+auto position = sampleMotor.getPosition();
+std::cout << position << std::endl;
+
+// Reset the position to 0
+sampleMotor.setPosition(0);
+```
+
+:::note
+The SmartMotor encoder is a **relative encoder**.
+That is, it will always reset to zero when the robot restarts.
+It cannot track the motor movement while the robot is off.
+
+An **absolute encoder** could track the orientation/position of a shaft across restarts, even if it moves while the robot is off.
+:::
+
+## Motor Group
+
+Often times, a robot will have a group of multiple motors that are geared or mechanically linked together.
+In cases like these, a `SmartMotorGroup` can be used to control all of the motors at once instead of controlling each motor individually.
+
+
+### Example
+```cpp
+// Create a SmartMotorGroup object called "sampleMotorGroup"
+SmartMotorGroup sampleMotorGroup = SmartMotorGroup(
+    "MotorGroupName", // <-- Name of the motor group for logging
+    {1, -2, 3, -4}    // <-- List the port of each motor (negative = reversed)
+);
+
+void opcontrol() override
+{
+    while (true)
+    {
+        // Get the up/down input from the left joystick
+        float joystickInput = mainController.leftY;
+
+        // Moves all of the motors depending on the joystick input
+        sampleMotorGroup.move(joystickInput);
+
+        // ...
+    }
+}
+```
+
+## Brake Mode
+
+By default, VEX SmartMotors are in coast mode.
+That is, when there is zero power applied to the motor, the shaft will coast until friction inevitable slows it to a stop.
+By enabling brake mode, you can use apply a slight braking force to the motor shaft whenever there is zero power applied.
+
+This works because a DC motor is also an electric generator.
+The motor can convert the kinect energy of its shaft into electric energy which is used to apply power opposite it's the rotational direction.
+You can do this yourself to any DC motor by bridging the positive and negative leads.
+
+### Example
+```cpp
+MyRobot() {
+    sampleMotor.setBrakeMode(true);     // <-- Enable brake mode
+    //sampleMotor.setBrakeMode(false);  // <-- Or disable brake mode
+}
+
+void opcontrol() override {
+    // This will prevent the motor from rotating
+    sampleMotor.move(0);
+
+    // Alternatively, you can call the "stop()" method
+    sampleMotor.stop();
+}
+```
+
+:::warning
+Brake mode inherently generates a lot of heat when stopping the motor.
+You may notice the motors thermal throttling faster than usual.
+Don't use this for motors that start and stop frequently during a match such as the drivetrain.
+:::
+
+## Thermal Throttling
+As motors accelerate and decelerate, their coils generate a lot of heat.
+This heat is naturally dissipated over time, but if too much build up in a VEX SmartMotor then the power is throttled until they're cooled back down.
+
+
+| Motor Temp          | Torque Limit          |
+|-----                |-----                  |
+| 50°C *(120°F)*      | 50%                   |
+| 60°C *(140°F)*      | 25%                   |
+| 65°C *(150°F)*      | 12.5%                 |
+| 70°C *(160°F)*      | 0% *(Motor Disabled)* |
+
+You can also monitor the motor temperature in DevilLib.
+
+```cpp
+// Gets the motor temperature in celsius (with 5deg of resolution)
+float motorTemperature = sampleMotor.getTemperature();
+```
+
+## Current Limiting
+In addition to thermal throttling, VEX SmartMotors also throttle depending on the amount of connected motors the VEX V5 brain currently has connected.
+Due to V5RC's 8 motor limit, this is only applicable to VURC teams.
+
+The current limit of each motor in amps ($C_{limit}$) based on the total number of SmartMotors connected to the brain ($M_{count}$) can be calculated with the following:
+
+$$
+C_{limit} = 0.925 * \log_e\frac{12800}{M_{count}} - 4.324
+$$
+
+Each motor is capped at **2.5A** each.
+
+If a custom current limit is set by the user, that is prioritized *(if it smaller than that the existing limit)*.
+Doing so shares unused battery current with the other motors.
+
+```cpp
+// Set a 1.0A current limit
+sampleMotor.setCurrentLimit(1.0f);
+```
+
+[Source: VEX Forum](https://www.vexforum.com/t/how-does-the-decreased-current-affect-the-robot-when-using-more-than-8-motors/72650/16)

@@ -1,0 +1,59 @@
+---
+sidebar_position: 5
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
+# 6 - Displays
+
+By default, VEX displays the default legacy UI on the V5 Brain's screen.
+
+This...this is boring. Fortunately, DevilLib includes some premade displays to apply to the V5 Brain's screen.
+In addition, you can create your own custom displays using the LVGL library included with PROS.
+
+## Built-In Displays
+
+<Tabs>
+    <TabItem value="toast" label="ToastDisplay" default>
+
+        ![Toast Display](/img/ToastDisplay.png)
+
+        This is an error overlay designed to be used in conjunction with other displays.
+        It shows any errors or warning that were caught by the system.
+        This is very useful to warn the team if any motors/sensors are disconnected or not working properly.
+
+        ```cpp
+            // Create a ToastDisplay
+            // This MUST be a shared_ptr since it runs a `BackgroundTask`
+            std::shared_ptr<ToastDisplay> toastDisplay = std::make_shared<ToastDisplay>();
+
+            MyRobot() {
+                // Start the ToastDisplay's background task
+                toastDisplay->start();
+
+                // ...
+            }
+        ```
+    </TabItem>
+</Tabs>
+
+## Custom Displays
+
+You can also create your own custom displays using the LVGL library included with PROS.
+This is a more advanced topic, but it allows you to create completely custom interfaces for your robot.
+
+```cpp
+class ExampleDisplay : DisplayBase
+{
+public:
+    ExampleDisplay()
+    {
+        static auto exampleObject = lv_obj_create(getRootContainer());
+    }
+};
+```
+
+You can refer to the LVGL documentation for more information on how to use it: [LVGL API Reference](https://docs.lvgl.io/master/)

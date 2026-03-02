@@ -1,0 +1,140 @@
+---
+sidebar_position: 2
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
+# Feedforward Systems
+
+<Tabs groupId="feedforward">
+    <TabItem value="motor" label="Motor" default>
+        <ThemedImage
+          alt="Motor"
+          sources={{
+            light: useBaseUrl('/img/MotorFeedforward-Light.png'),
+            dark: useBaseUrl('/img/MotorFeedforward-Dark.png'),
+          }}
+        />
+
+        A `MotorFeedforward` is the baseline feedforward and can be used when there are no external forces acting on the mechanism.
+        An example of this would be a the robot drivetrain, where the motors only have to fight against friction and inertia.
+        If your motors are constantly fighting against gravity, an `ElevatorFeedforward` might be a better option.
+
+        ```cpp
+        // Create the feedforward controller
+        MotorFeedforward feedforward = MotorFeedforward(MotorFeedforward::Options {
+            // All these values will need to be tuned to your robot
+            staticFriction = 1.0f,      // <-- Power required to overcome static friction
+            velocityGain = 1.0f,        // <-- Power required to maintain a constant velocity
+            accelerationGain = 1.0f     // <-- Power required to accelerate
+        });
+
+        void opcontrol() override
+        {
+            while (true) {
+                // This is how fast the motor should be moving currently (in/s)
+                float targetVelocity = 100.0f;
+
+                // This is how fast the motor should be accelerating (in/s^2)
+                float targetAcceleration = 0.0f;
+
+                // Calculate the amount of voltage to apply to the motor
+                float feedforwardOutput = feedforward.update(targetVelocity, targetAcceleration);
+                sampleMotor.move(feedforwardOutput);
+
+                // ...
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="elevator" label="Elevator">
+        <ThemedImage
+          alt="Elevator"
+          sources={{
+            light: useBaseUrl('/img/ElevatorFeedforward-Light.png'),
+            dark: useBaseUrl('/img/ElevatorFeedforward-Dark.png'),
+          }}
+        />
+
+        An `ElevatorFeedforward` can be used if there is a constant force applied (such as gravity) throughout the mechanism.
+        If the force of gravity changes depending on the rotation (such as an arm), you can use an `ArmFeedforward` instead.
+
+        ```cpp
+        // Create the feedforward controller
+        ElevatorFeedforward feedforward = ElevatorFeedforward(ElevatorFeedforward::Options {
+            // All these values will need to be tuned to your robot
+            gravity = 1.0f,             // <-- Power required to overcome gravity
+            staticFriction = 1.0f,      // <-- Power required to overcome static friction
+            velocityGain = 1.0f,        // <-- Power required to maintain a constant velocity
+            accelerationGain = 1.0f     // <-- Power required to accelerate
+        });
+
+        void opcontrol() override
+        {
+            while (true) {
+                // This is how fast the elevator should be moving currently (in/s)
+                float targetVelocity = 100.0f;
+
+                // This is how fast the elevator should be accelerating (in/s^2)
+                float targetAcceleration = 0.0f;
+
+                // Calculate the amount of voltage to apply to the motor
+                float feedforwardOutput = feedforward.update(targetVelocity, targetAcceleration);
+                elevatorMotor.move(feedforwardOutput);
+
+                // ...
+            }
+        }
+        ```
+    </TabItem>
+    <TabItem value="arm" label="Arm">
+        <ThemedImage
+          alt="Arm"
+          sources={{
+            light: useBaseUrl('/img/ArmFeedforward-Light.png'),
+            dark: useBaseUrl('/img/ArmFeedforward-Dark.png'),
+          }}
+        />
+
+        An `ArmFeedforward` can be used when the force of gravity changes depending on the rotation of the mechanism.
+
+        For example, when the arm is all the way down or all the way up, the force of gravity is negated by the mechanism's internal structure.
+        When the arm motor is fully horizontal, the arm motor(s) have to fight against the maximum amount of gravity.
+
+        ```cpp
+        // Create the feedforward controller
+        ArmFeedforward feedforward = ArmFeedforward(ArmFeedforward::Options {
+            // All these values will need to be tuned to your robot
+            gravity = 1.0f,             // <-- Power required to overcome gravity
+            staticFriction = 1.0f,      // <-- Power required to overcome static friction
+            velocityGain = 1.0f,        // <-- Power required to maintain a constant velocity
+            accelerationGain = 1.0f     // <-- Power required to accelerate
+        });
+
+        void opcontrol() override
+        {
+            while (true) {
+                // This is how fast the arm should be moving currently (in/s)
+                float targetVelocity = 100.0f;
+
+                // This is how fast the arm should be accelerating (in/s^2)
+                float targetAcceleration = 0.0f;
+
+                // Calculate the current rotation of the arm in radians.
+                // (0 radians would be fully extended horizontally)
+                float currentArmPosition = armMotor.getPosition();  // <-- Gets the current encoder ticks
+                float currentArmRotation = currentArmPosition / 300.0f * 2 * M_PI;  // <-- Converts encoder ticks to radians
+
+                // Calculate the amount of voltage to apply to the motor
+                float feedforwardOutput = feedforward.update(targetVelocity, targetAcceleration);
+                armMotor.move(feedforwardOutput);
+
+                // ...
+            }
+        }
+        ```
+    </TabItem>
+</Tabs>

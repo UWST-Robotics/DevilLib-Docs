@@ -1,0 +1,49 @@
+---
+sidebar_position: 3
+---
+
+# Symmetric Control
+
+Symmetric control utilizes the VEX built-in motor encoders to control 2 sets of `SmartMotorGroup`s in unison.
+This ensures that both sets of motors rotate the exact same distance over time.
+
+:::info
+This was initially designed and utilized for [DEVIL5's climbing mech](https://youtu.be/d7OoX2oSvVE?si=U_p5H565alN9qxrU&t=1260) in High Stakes (2024-25).
+This utilized a PTO system that used the robot's drivetrain motors to pull the robot up during the climb.
+In this case, the robot was kept level by ensuring the left and right climbing hooks were kept at the same height throughout the climb.
+:::
+
+Under the hood, this drives both sides by the same amount, but gradually slows down whichever motor group is "too far ahead".
+
+```cpp
+// Define the symmetric controller
+SymmetricControl symmetricControl = SymmetricControl(leftMotors, rightMotors);
+
+void opcontrol() override {
+    while (true) {
+        symmetricControl.drive(
+            mainController.leftY,   // <-- Drives both motor groups forward or backward at the same pace
+            mainController.leftX    // <-- Increases/decreases the offset between the left and right motors
+        );
+
+        // ...
+    }
+}
+
+```
+
+## Reset Offsets
+
+If the motor groups start at weird offsets, you can reset their "starting positions" to whatever their current position is by calling `symmetricControl.resetOffsets()`.
+
+```cpp
+void opcontrol() override {
+    while (true) {
+        // If the A button is pressed, reset the offsets
+        if (mainController.a)
+            symmetricControl.resetOffsets();
+
+        // ...
+    }
+}
+```

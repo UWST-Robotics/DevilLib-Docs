@@ -1,0 +1,47 @@
+---
+sidebar_position: 2.5
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
+# Motion Profiles
+
+Motion profiles are depictions of how a robot should move from point A to point B.
+
+## Trapezoidal Motion Profile
+
+<ThemedImage
+  alt="Trapezoidal Motion Profile"
+  sources={{
+    light: useBaseUrl('/img/Trapezoid-Light.png'),
+    dark: useBaseUrl('/img/Trapezoid-Dark.png'),
+  }}
+/>
+
+```cpp
+TrapezoidMotionProfile::Constraints constraints{
+    .maxVelocity = 36.0f,     // in/s
+    .maxAcceleration = 48.0f, // in/s^2
+    .maxDeceleration = 100.0f // in/s^2
+};
+
+TrapezoidMotionProfile profile = TrapezoidMotionProfile(
+    constraints,
+    100.0f, // distance to travel (in)
+    0.0f,   // initial velocity (in/s)
+    0.0f    // ending velocity (in/s)
+);
+
+void opcontrol() override {
+    while (true) {
+        auto expectedState = profile.getStateAtTime(pros::millis() / 1000.0);
+
+        // Use expectedState.position and expectedState.velocity to control the robot
+        // ...
+    }
+}
+
+```
