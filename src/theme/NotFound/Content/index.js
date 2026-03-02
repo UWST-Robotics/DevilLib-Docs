@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import Heading from '@theme/Heading';
+import Heading from "@theme/Heading";
 import Link from "@docusaurus/Link";
 
 export default function NotFoundContent({className}) {
@@ -9,7 +9,7 @@ export default function NotFoundContent({className}) {
       <div className="row">
         <div className="col col--6 col--offset-3">
           <img
-              src={"/img/404.webp"}
+              src={"/img/oof.gif"}
               alt={"404 Animation"}
               height={150}
               style={{borderRadius: 10, marginBottom: 20}}
